@@ -1,18 +1,44 @@
-import { buildSchema } from '@camberi/firecms';
+import { buildSchema, EntityReference } from '@camberi/firecms';
 
 type Topics = {
-  difficulty: string;
-  duration: number;
-  image: string;
   lessonNumber: number;
-  publish: boolean;
-  status: string;
   title: string;
+  duration: number;
+  difficulty: string;
+  image: string;
+  phrases: EntityReference[];
+  status: string;
+  publish: boolean;
 }
 
 export const topicsSchema = buildSchema<Topics>({
   name: 'Topics',
   properties: {
+    lessonNumber: {
+      title: 'Lesson Number',
+      validation: {
+        required: true,
+        requiredMessage: 'You must set a lesson number between 0 and 10',
+        min: 0,
+        max: 10,
+      },
+      dataType: 'number',
+    },
+    title: {
+      title: 'Title',
+      validation: { required: true },
+      dataType: 'string',
+    },
+    duration: {
+      title: 'Duration',
+      validation: {
+        required: true,
+        requiredMessage: 'You must set a duration between 0 and 60 minutes',
+        min: 0,
+        max: 60,
+      },
+      dataType: 'number',
+    },
     difficulty: {
       title: 'Difficult',
       validation: { required: true },
@@ -24,16 +50,6 @@ export const topicsSchema = buildSchema<Topics>({
           hard: 'Hard',
         },
     },
-  },
-  duration: {
-    title: 'Duration',
-    validation: {
-      required: true,
-      requiredMessage: 'You must set a duration between 0 and 1000',
-      min: 0,
-      max: 1000,
-    },
-    dataType: 'number',
   },
   image: {
     title: 'Image',
@@ -47,19 +63,14 @@ export const topicsSchema = buildSchema<Topics>({
       },
     },
   },
-  lessonNumber: {
-    title: 'Lesson Number',
-    validation: {
-      required: true,
-      requiredMessage: 'You must set a lesson number between 0 and 1000',
-      min: 0,
-      max: 1000,
+  phrases: {
+    dataType: 'array',
+    title: 'Phrases',
+    description: 'Reference to phrases',
+    of: {
+      dataType: 'reference',
+      path: 'phrases',
     },
-    dataType: 'number',
-  },
-  publish: {
-    title: 'Publish',
-    dataType: 'boolean',
   },
   status: {
     title: 'Status',
@@ -72,10 +83,10 @@ export const topicsSchema = buildSchema<Topics>({
       },
     },
   },
-  title: {
-    title: 'Title',
-    validation: { required: true },
-    dataType: 'string',
+  publish: {
+    title: 'Publish',
+    dataType: 'boolean',
   },
+
 },
 });

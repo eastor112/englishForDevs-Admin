@@ -11,11 +11,11 @@ import {
 
 import 'typeface-rubik';
 import 'typeface-space-mono';
-import { productSchema } from './schemas/productSchema';
-import { localeSchema } from './schemas/localeSchema';
 import { firebaseConfig } from './config/firebase';
 import { wordSchema } from './schemas/wordsSchema';
 import { phraseSchema } from './schemas/phraseSchema';
+import { lessonSchema } from './schemas/lessonSchema';
+import { topicsSchema } from './schemas/topicsSchema';
 
 export default function App() {
   const navigation: NavigationBuilder = async ({
@@ -24,24 +24,6 @@ export default function App() {
   }: NavigationBuilderProps) => {
     return {
       collections: [
-        buildCollection({
-          path: 'products',
-          schema: productSchema,
-          name: 'Products',
-          permissions: ({ authController }) => ({
-            edit: true,
-            create: true,
-            delete: authController.extra.roles.includes('admin'),
-          }),
-          subcollections: [
-            buildCollection({
-              name: 'Locales',
-              path: 'locales',
-              schema: localeSchema,
-            }),
-          ],
-        }),
-
         buildCollection({
           path: 'words',
           schema: wordSchema,
@@ -62,6 +44,24 @@ export default function App() {
             create: true,
             delete: authController.extra.roles.includes('admin'),
           }),
+        }),
+
+        buildCollection({
+          path: 'lessons',
+          schema: lessonSchema,
+          name: 'Lessons',
+          permissions: ({ authController }) => ({
+            edit: true,
+            create: true,
+            delete: authController.extra.roles.includes('admin'),
+          }),
+          subcollections: [
+            buildCollection({
+              name: 'Topics',
+              path: 'topics',
+              schema: topicsSchema,
+            }),
+          ],
         }),
       ],
     };
