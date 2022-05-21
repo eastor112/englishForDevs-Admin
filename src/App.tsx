@@ -1,26 +1,97 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
+import { User as FirebaseUser } from 'firebase/auth';
+import {
+  Authenticator,
+  buildCollection,
+  FirebaseCMSApp,
+  NavigationBuilder,
+  NavigationBuilderProps,
+} from '@camberi/firecms';
+
+import 'typeface-rubik';
+import 'typeface-space-mono';
+import { productSchema } from './schemas/productSchema';
+import { localeSchema } from './schemas/localeSchema';
+import { firebaseConfig } from './config/firebase';
+import { wordSchema } from './schemas/wordsSchema';
+import { phraseSchema } from './schemas/phraseSchema';
+
+export default function App() {
+  const navigation: NavigationBuilder = async ({
+    user,
+    authController,
+  }: NavigationBuilderProps) => {
+    return {
+      collections: [
+        buildCollection({
+          path: 'products',
+          schema: productSchema,
+          name: 'Products',
+          permissions: ({ authController }) => ({
+            edit: true,
+            create: true,
+            delete: authController.extra.roles.includes('admin'),
+          }),
+          subcollections: [
+            buildCollection({
+              name: 'Locales',
+              path: 'locales',
+              schema: localeSchema,
+            }),
+          ],
+        }),
+
+        buildCollection({
+          path: 'words',
+          schema: wordSchema,
+          name: 'Words',
+          permissions: ({ authController }) => ({
+            edit: true,
+            create: true,
+            delete: authController.extra.roles.includes('admin'),
+          }),
+        }),
+
+        buildCollection({
+          path: 'phrases',
+          schema: phraseSchema,
+          name: 'Phrases',
+          permissions: ({ authController }) => ({
+            edit: true,
+            create: true,
+            delete: authController.extra.roles.includes('admin'),
+          }),
+        }),
+      ],
+    };
+  };
+
+  const myAuthenticator: Authenticator<FirebaseUser> = async ({
+    user,
+    authController,
+  }) => {
+    if (!user?.email?.includes('emerar.mct@gmail.com')) {
+      throw Error('You are not allowed to access this app');
+    }
+
+    console.log('Allowing access to', user?.email);
+
+    const sampleUserData = await Promise.resolve({
+      roles: ['admin'],
+    });
+
+    authController.setExtra(sampleUserData);
+    return true;
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <FirebaseCMSApp
+      name={'EnglishForDevs'}
+      authentication={myAuthenticator}
+      navigation={navigation}
+      firebaseConfig={firebaseConfig}
+      logo={require('./assets/logo.png')}
+    />
   );
 }
-
-export default App;
