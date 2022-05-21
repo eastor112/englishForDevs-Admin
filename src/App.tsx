@@ -28,6 +28,7 @@ export default function App() {
           path: 'words',
           schema: wordSchema,
           name: 'Words',
+          description: 'Individual words present in all lessons',
           permissions: ({ authController }) => ({
             edit: true,
             create: true,
