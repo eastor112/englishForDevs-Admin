@@ -1,11 +1,12 @@
 import { buildSchema, EntityReference } from '@camberi/firecms';
 
 type Topics = {
-  lessonNumber: number;
+  topicNumber: number;
   title: string;
   duration: number;
   difficulty: string;
   image: string;
+  words: EntityReference[];
   phrases: EntityReference[];
   status: string;
   publish: boolean;
@@ -14,11 +15,11 @@ type Topics = {
 export const topicsSchema = buildSchema<Topics>({
   name: 'Topics',
   properties: {
-    lessonNumber: {
-      title: 'Lesson Number',
+    topicNumber: {
+      title: 'Topic Number',
       validation: {
         required: true,
-        requiredMessage: 'You must set a lesson number between 0 and 10',
+        requiredMessage: 'You must set a topic number between 0 and 10',
         min: 0,
         max: 10,
       },
@@ -63,9 +64,20 @@ export const topicsSchema = buildSchema<Topics>({
       },
     },
   },
-  phrases: {
+  words: {
+    title: 'Words',
     dataType: 'array',
+    validation: { required: false },
+    description: 'Words that are associated with this topic',
+    of :{
+      dataType: 'reference',
+      path: 'words',
+    },
+  },
+  phrases: {
     title: 'Phrases',
+    dataType: 'array',
+    validation: { required: false },
     description: 'Reference to phrases',
     of: {
       dataType: 'reference',
