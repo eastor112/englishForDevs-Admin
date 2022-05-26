@@ -16,6 +16,7 @@ import { wordSchema } from './schemas/wordsSchema';
 import { phraseSchema } from './schemas/phraseSchema';
 import { lessonSchema } from './schemas/lessonSchema';
 import { topicsSchema } from './schemas/topicsSchema';
+import { usersSchema } from './schemas/usersSchema';
 
 export default function App() {
   const navigation: NavigationBuilder = async ({
@@ -63,6 +64,17 @@ export default function App() {
               schema: topicsSchema,
             }),
           ],
+        }),
+
+        buildCollection({
+          path: 'users',
+          schema: usersSchema,
+          name: 'Users',
+          permissions: ({ authController }) => ({
+            edit: true,
+            create: false,
+            delete: authController.extra.roles.includes('admin'),
+          }),
         }),
       ],
     };
